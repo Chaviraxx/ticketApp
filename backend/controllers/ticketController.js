@@ -1,11 +1,15 @@
 const asyncHandler = require('express-async-handler')
 
+const Ticket = require('../models/ticketModel')
+
 // @desc Get goals
 // @route GET /api/goals
 // @access Private
 
 const getGoals = asyncHandler(async (req, res) => {
-    res.status(200).json({ message: 'Get Tickets'})
+    const goals = await Ticket.find()
+
+    res.status(200).json(goals)
 })
 
 // @desc Set goals
@@ -16,8 +20,12 @@ const setGoals = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error('Please add a text field')
     }
+    // creates ticket
+    const ticket = await Ticket.create({
+        text: req.body.text
+    })
 
-    res.status(200).json({message: 'Set ticket'})
+    res.status(200).json(ticket)
 
 })
 
@@ -26,14 +34,35 @@ const setGoals = asyncHandler(async (req, res) => {
 // @access Private
 
 const updateGoals = asyncHandler(async(req, res) => {
-    res.status(200).json({ message: `Update ticket ${req.params.id}` })
+    const ticket = await Ticket.findById(req.params.id)
+
+    if(!ticket){
+        res.status(400)
+        throw new Error('Ticket not found')
+    }
+
+    const updatedTicket = await Ticket.findByIdAndUpdate(req.params.id, req.body,{
+        new: true,
+    })
+
+    res.status(200).json(updatedTicket)
 })
 // @desc Delete goals
 // @route DELETE /api/goals/:id
 // @access Private
 
 const deleteGoals = asyncHandler(async (req, res) => {
-    res.status(200).json({ message: `Delete goal ${req.params.id}` })
+
+    const ticket = await Ticket.findById(req.params.id)
+
+    if(!ticket){
+        res.status(400)
+        throw new Error('Ticket not found')
+    }
+
+   await ticket.remove()
+
+    res.status(200).json({id: req.params.id})
 })
 
 module.exports = {
