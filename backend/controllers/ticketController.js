@@ -1,13 +1,14 @@
 const asyncHandler = require('express-async-handler')
 
 const Ticket = require('../models/ticketModel')
+const User = require('../models/userModel')
 
 // @desc Get goals
 // @route GET /api/goals
 // @access Private
 
 const getGoals = asyncHandler(async (req, res) => {
-    const goals = await Ticket.find()
+    const goals = await Ticket.find({ user: req.user.id })
 
     res.status(200).json(goals)
 })
@@ -22,7 +23,8 @@ const setGoals = asyncHandler(async (req, res) => {
     }
     // creates ticket
     const ticket = await Ticket.create({
-        text: req.body.text
+        text: req.body.text,
+        user: req.user.id,
     })
 
     res.status(200).json(ticket)
@@ -39,6 +41,18 @@ const updateGoals = asyncHandler(async(req, res) => {
     if(!ticket){
         res.status(400)
         throw new Error('Ticket not found')
+    }
+
+    const user = await User.findById(req.user.id)
+    //check for user
+    if(!user){
+        res.status(401)
+        throw new Error('User not foud')
+    }
+    //Make sure the logged in user matches the goal user
+    if(ticket.user.toString() !== user.id){
+        res.status(401)
+        throw new Error('User not authorized')
     }
 
     const updatedTicket = await Ticket.findByIdAndUpdate(req.params.id, req.body,{
@@ -58,6 +72,20 @@ const deleteGoals = asyncHandler(async (req, res) => {
     if(!ticket){
         res.status(400)
         throw new Error('Ticket not found')
+    }
+
+    const user = await User.findById(req.user.id)
+
+    //check for user
+    if(!user){
+        res.status(401)
+        throw new Error('User not foud')
+    }
+
+    //Make sure the logged in user matches the goal user
+    if(ticket.user.toString() !== user.id){
+        res.status(401)
+        throw new Error('User not authorized')
     }
 
    await ticket.remove()

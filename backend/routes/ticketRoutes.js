@@ -3,11 +3,11 @@ const router = express.Router()
 
 const { getGoals, setGoals, updateGoals, deleteGoals } = require('../controllers/ticketController')
 
+const {protect} = require('../middleware/authMiddleware')
 
 // GET & POST API Methods
-router.route('/').get(getGoals).post(setGoals)
-
-router.route('/:id').delete(deleteGoals).put(updateGoals)
+router.route('/').get(protect, getGoals).post(protect, setGoals)
+router.route('/:id').delete(protect, deleteGoals).put(protect, updateGoals)
 
 // // Get API method
 // router.get('/', getGoals)
