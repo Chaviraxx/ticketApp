@@ -21,7 +21,7 @@ function Register() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    const {user, isLoading, isError, isSuccess, message} = useSelector((state) => state.auth)
+    const { user, isLoading, isError, isSuccess, message} = useSelector((state) => state.auth)
 
     useEffect(() => {
         if(isError){
@@ -40,7 +40,7 @@ function Register() {
         setFormData((prevState) =>({
             ...prevState,
             [e.target.name]: e.target.value,
-        }) )
+        }))
     }
 
     const onSubmit = (e) => {
@@ -70,13 +70,15 @@ function Register() {
             </h1>
             <p>Please create an account</p>
         </section>
+
         <section className='form'>
             <form onSubmit={onSubmit}>
                 <div className="form-group">
                     <input 
                         type="text" 
                         className="form-control" 
-                        id='name' name='name' 
+                        id='name' 
+                        name='name' 
                         value={name} 
                         placeholder='Name' 
                         onChange={onChange}
@@ -86,7 +88,8 @@ function Register() {
                     <input 
                         type="email" 
                         className="form-control" 
-                        id='email' name='email' 
+                        id='email' 
+                        name='email' 
                         value={email} 
                         placeholder='Email' 
                         onChange={onChange}
